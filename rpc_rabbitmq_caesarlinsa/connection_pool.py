@@ -2,6 +2,7 @@
 import abc
 import collections
 import threading
+from rpc_rabbitmq_caesarlinsa.config import options
 
 
 class Pool(object):
@@ -63,9 +64,9 @@ class Pool(object):
 
 
 class ConnectionPool(Pool):
-    def __init__(self, connection_cls, connection_pool_size=100):
+    def __init__(self, connection_cls):
         self.connection_cls = connection_cls
-        super(ConnectionPool, self).__init__(connection_pool_size)
+        super(ConnectionPool, self).__init__(options.connection_pool_size)
 
     def create(self):
         return self.connection_cls()

@@ -10,17 +10,8 @@ from rpc_rabbitmq_caesarlinsa.rabbitmq_entity import (Target,
                                                       TopicPublisher,
                                                       DirectPublisher)
 from rpc_rabbitmq_caesarlinsa.connection_pool import get_connection_pool
-from oslo_config import cfg
-
+from rpc_rabbitmq_caesarlinsa.config import options
 MSG_ID = 'msg_id'
-
-conf = cfg.CONF
-
-rabbit_url = cfg.StrOpt('RABBITMQ_CONNECTION_URL',
-                        default='amqp://guest:guest@localhost:5672//',
-                        help='rabbitmq login url.'),
-
-conf.register_opts(rabbit_url)
 
 
 class Connection(object):
@@ -28,8 +19,13 @@ class Connection(object):
 
     def __init__(self, connection_url=None):
         self.consumers = []
+        RABBIT_URL = "amqp://%s:%s@%s:%s//" % (
+            options.rabbit_user,
+            options.rabbit_password,
+            options.rabbit_host,
+            options.rabbit_port)
         self.connection_url = connection_url if connection_url \
-            else conf.get("RABBITMQ_CONNECTION_URL")
+            else RABBIT_URL
         if not self.connection_url:
             raise Exception("connection url can't be None")
         self.reconnect()
@@ -86,7 +82,7 @@ class Connection(object):
 
         def _declare_consumer():
             consumer = consumer_cls(self.channel, target, callback)
-            self.consumer_num.next()
+            next(self.consumer_num)
             self.consumers.append(consumer)
             return consumer
 
@@ -114,7 +110,7 @@ class Connection(object):
 
         for iteration in itertools.count(0):
             if limit and iteration >= limit:
-                raise StopIteration
+                raise StopIteration()
             yield self.ensure(_error_callback, _consume)
 
     def publisher_send(self, cls, target, msg, timeout=None):
@@ -146,8 +142,11 @@ class Connection(object):
         it = self.iterconsume(limit=limit, timeout=timeout)
         while True:
             try:
-                it.next()
+                next(it)
             except StopIteration:
+                print("return")
+                return
+            except Exception as e:
                 return
 
     def close(self):

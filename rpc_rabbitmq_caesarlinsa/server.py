@@ -41,7 +41,7 @@ class Server(object):
 
     def __dispatch(self, endpoint, method, args):
         new_args = dict()
-        for argname, arg in args.iteritems():
+        for argname, arg in args.items():
             new_args[argname] = arg
         result = getattr(endpoint, method)(**new_args)
         return result

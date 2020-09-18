@@ -2,8 +2,10 @@ from rpc_rabbitmq_caesarlinsa.server import Server
 from rpc_rabbitmq_caesarlinsa.connection_pool import get_connection_pool
 from rpc_rabbitmq_caesarlinsa.connection import Connection, ConnectionContext
 from rpc_rabbitmq_caesarlinsa.rabbitmq_entity import Target
+from rpc_rabbitmq_caesarlinsa.options import parse_config_file
 import time
 
+parse_config_file("./config")
 target = Target("task_exchange", "task", "task_queue")
 
 

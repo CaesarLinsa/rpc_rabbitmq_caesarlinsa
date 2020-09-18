@@ -1,2 +1,6 @@
 [DEFAULT]
-RABBITMQ_CONNECTRL = "amqp://guest:guest@196.168.1.120:5672//"
+connection_pool_size=200
+rabbit_user=guest
+rabbit_password=guest
+rabbit_host=196.168.1.120
+rabbit_port=5672
